@@ -1,0 +1,101 @@
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { supabase } from '../lib/supabase';
+
+const LoginPage: React.FC = () => {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      navigate('/');
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen pt-32 pb-16">
+      <div className="container-custom max-w-md">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="bg-white p-8 rounded-xl shadow-md"
+        >
+          <h1 className="text-3xl font-serif font-bold mb-6 text-center">Welcome Back</h1>
+          
+          {error && (
+            <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-6">
+              {error}
+            </div>
+          )}
+          
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-neutral-700 mb-1">
+                Email Address
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="input"
+                required
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-neutral-700 mb-1">
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="input"
+                required
+              />
+            </div>
+            
+            <button
+              type="submit"
+              disabled={loading}
+              className={`btn btn-primary w-full ${loading ? 'opacity-75 cursor-not-allowed' : ''}`}
+            >
+              {loading ? 'Signing in...' : 'Sign In'}
+            </button>
+          </form>
+          
+          <p className="mt-4 text-center text-neutral-600">
+            Don't have an account?{' '}
+            <Link to="/signup" className="text-primary-600 hover:text-primary-700">
+              Sign up
+            </Link>
+          </p>
+        </motion.div>
+      </div>
+    </div>
+  );
+};
+
+export default LoginPage;
