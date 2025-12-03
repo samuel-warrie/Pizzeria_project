@@ -6,6 +6,7 @@
 +import { Pizza, Clock, Star, MapPin, ChefHat } from 'lucide-react';
 
  export const Home: React.FC = () => {
+ }
 @@ .. @@
            <motion.div
              initial={{ opacity: 0, y: 20 }}
