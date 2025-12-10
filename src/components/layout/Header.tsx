@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { PizzaIcon, Menu, X, ShoppingCart } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { PizzaIcon, Menu, X, ShoppingCart, User, LogOut } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 import MobileMenu from './MobileMenu';
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { cartItems, toggleCart } = useCart();
+  const { user, signOut } = useAuth();
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -29,6 +33,24 @@ const Header: React.FC = () => {
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
+  const handleLogout = async () => {
+    await signOut();
+    setIsUserMenuOpen(false);
+    navigate('/');
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (isUserMenuOpen && !target.closest('.user-menu-container')) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [isUserMenuOpen]);
 
   const navLinks = [
     { name: 'Home', path: '/' },
@@ -94,7 +116,62 @@ const Header: React.FC = () => {
               </span>
             )}
           </button>
-          
+
+          {user ? (
+            <div className="hidden md:block relative user-menu-container">
+              <button
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                className={`flex items-center gap-2 p-2 rounded-full transition-colors ${
+                  isScrolled
+                    ? 'text-neutral-800 hover:bg-neutral-100'
+                    : 'text-white hover:bg-white/10'
+                }`}
+                aria-label="User menu"
+              >
+                <User className="h-6 w-6" />
+              </button>
+
+              {isUserMenuOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                  <Link
+                    to="/profile"
+                    onClick={() => setIsUserMenuOpen(false)}
+                    className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    <User className="h-4 w-4" />
+                    Profile
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="hidden md:flex items-center gap-2">
+              <Link
+                to="/login"
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  isScrolled
+                    ? 'text-neutral-800 hover:bg-neutral-100'
+                    : 'text-white hover:bg-white/10'
+                }`}
+              >
+                Login
+              </Link>
+              <Link
+                to="/signup"
+                className="px-4 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
+              >
+                Sign Up
+              </Link>
+            </div>
+          )}
+
           <button
             onClick={toggleMobileMenu}
             className="p-2 md:hidden rounded-full transition-colors"
@@ -118,7 +195,12 @@ const Header: React.FC = () => {
       </div>
 
       {/* Mobile Menu */}
-      <MobileMenu isOpen={isMobileMenuOpen} navLinks={navLinks} />
+      <MobileMenu
+        isOpen={isMobileMenuOpen}
+        navLinks={navLinks}
+        user={user}
+        onLogout={handleLogout}
+      />
     </header>
   );
 };
