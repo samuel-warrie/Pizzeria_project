@@ -121,7 +121,7 @@ Deno.serve(async (req) => {
       mode,
       success_url,
       cancel_url,
-      payment_method_types: ['card', 'mobilepay', 'google_pay'],
+      payment_method_types: ['card', 'mobilepay'],
       payment_method_options: {
         card: {
           request_three_d_secure: 'automatic',
