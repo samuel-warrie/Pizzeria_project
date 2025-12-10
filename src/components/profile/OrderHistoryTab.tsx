@@ -184,28 +184,29 @@ export default function OrderHistoryTab() {
                 </div>
               )}
 
-              {order.order_items && order.order_items.length > 0 && (
-                <div className="mt-4 border-t border-gray-200 pt-4">
-                  <button
-                    onClick={() => toggleOrderExpansion(order.id)}
-                    className="flex items-center gap-2 text-sm font-medium text-orange-600 hover:text-orange-700 transition-colors"
-                  >
-                    {expandedOrders.has(order.id) ? (
-                      <>
-                        <ChevronUp className="w-4 h-4" />
-                        Hide Items ({order.order_items.length})
-                      </>
-                    ) : (
-                      <>
-                        <ChevronDown className="w-4 h-4" />
-                        View Items ({order.order_items.length})
-                      </>
-                    )}
-                  </button>
+              <div className="mt-4 border-t border-gray-200 pt-4">
+                <button
+                  onClick={() => toggleOrderExpansion(order.id)}
+                  className="flex items-center gap-2 text-sm font-medium text-orange-600 hover:text-orange-700 transition-colors"
+                >
+                  {expandedOrders.has(order.id) ? (
+                    <>
+                      <ChevronUp className="w-4 h-4" />
+                      Hide Order Details
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="w-4 h-4" />
+                      View Order Details
+                      {order.order_items && order.order_items.length > 0 && ` (${order.order_items.length} items)`}
+                    </>
+                  )}
+                </button>
 
-                  {expandedOrders.has(order.id) && (
-                    <div className="mt-4 space-y-3">
-                      {order.order_items.map((item) => (
+                {expandedOrders.has(order.id) && (
+                  <div className="mt-4 space-y-3">
+                    {order.order_items && order.order_items.length > 0 ? (
+                      order.order_items.map((item) => (
                         <div
                           key={item.id}
                           className="flex justify-between items-start p-3 bg-gray-50 rounded-lg"
@@ -228,11 +229,17 @@ export default function OrderHistoryTab() {
                             </p>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
+                      ))
+                    ) : (
+                      <div className="p-4 bg-gray-50 rounded-lg text-center">
+                        <p className="text-sm text-gray-500">
+                          Item details not available for this order.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
               <div className="flex justify-between items-end mt-4">
                 <div>
