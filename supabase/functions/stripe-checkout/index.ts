@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
       return corsResponse({ error: 'Method not allowed' }, 405);
     }
 
-    const { line_items, success_url, cancel_url, mode } = await req.json();
+    const { line_items, success_url, cancel_url, mode, address } = await req.json();
 
     const error = validateParameters(
       { line_items, success_url, cancel_url, mode },
@@ -114,6 +114,43 @@ Deno.serve(async (req) => {
       customerId = customer.customer_id;
     }
 
+    let addressId = address?.addressId;
+
+    if (address && address.saveToProfile && !addressId) {
+      const { data: newAddress, error: addressError } = await supabase
+        .from('user_addresses')
+        .insert({
+          user_id: user.id,
+          label: 'Home',
+          street: address.street,
+          city: address.city,
+          state: address.state,
+          zip_code: address.zipCode,
+          is_default: false,
+        })
+        .select()
+        .single();
+
+      if (addressError) {
+        console.error('Failed to save address to profile', addressError);
+      } else if (newAddress) {
+        addressId = newAddress.id;
+        console.log(`Saved new address ${addressId} for user ${user.id}`);
+      }
+    }
+
+    const sessionMetadata: Record<string, string> = {
+      userId: user.id,
+    };
+
+    if (address) {
+      sessionMetadata.addressId = addressId || '';
+      sessionMetadata.street = address.street;
+      sessionMetadata.city = address.city;
+      sessionMetadata.state = address.state;
+      sessionMetadata.zipCode = address.zipCode;
+    }
+
     // create Checkout Session with multiple line items
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -127,6 +164,7 @@ Deno.serve(async (req) => {
           request_three_d_secure: 'automatic',
         },
       },
+      metadata: sessionMetadata,
     });
 
     console.log(`Created checkout session ${session.id} for customer ${customerId}`);

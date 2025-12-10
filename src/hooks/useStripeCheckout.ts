@@ -7,11 +7,21 @@ interface LineItem {
   quantity: number;
 }
 
+interface Address {
+  addressId?: string;
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  saveToProfile?: boolean;
+}
+
 interface CheckoutOptions {
   lineItems: LineItem[];
   mode: 'payment' | 'subscription';
   successUrl: string;
   cancelUrl: string;
+  address?: Address;
 }
 
 export const useStripeCheckout = () => {
@@ -19,7 +29,7 @@ export const useStripeCheckout = () => {
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
 
-  const createCheckoutSession = async ({ lineItems, mode, successUrl, cancelUrl }: CheckoutOptions) => {
+  const createCheckoutSession = async ({ lineItems, mode, successUrl, cancelUrl, address }: CheckoutOptions) => {
     if (!user) {
       setError('You must be logged in to checkout');
       return;
@@ -46,6 +56,7 @@ export const useStripeCheckout = () => {
           success_url: successUrl,
           cancel_url: cancelUrl,
           mode,
+          address,
         }),
       });
 

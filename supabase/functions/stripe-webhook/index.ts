@@ -91,16 +91,16 @@ async function handleEvent(event: Stripe.Event) {
       await syncCustomerFromStripe(customerId);
     } else if (mode === 'payment' && payment_status === 'paid') {
       try {
-        // Extract the necessary information from the session
         const {
           id: checkout_session_id,
           payment_intent,
           amount_subtotal,
           amount_total,
           currency,
+          customer_details,
+          metadata,
         } = stripeData as Stripe.Checkout.Session;
 
-        // Insert the order into the stripe_orders table
         const { error: orderError } = await supabase.from('stripe_orders').insert({
           checkout_session_id,
           payment_intent_id: payment_intent,
@@ -109,14 +109,57 @@ async function handleEvent(event: Stripe.Event) {
           amount_total,
           currency,
           payment_status,
-          status: 'completed', // assuming we want to mark it as completed since payment is successful
+          status: 'completed',
         });
 
         if (orderError) {
-          console.error('Error inserting order:', orderError);
+          console.error('Error inserting stripe order:', orderError);
           return;
         }
-        console.info(`Successfully processed one-time payment for session: ${checkout_session_id}`);
+
+        const userId = metadata?.userId;
+        if (!userId) {
+          console.error('No userId in session metadata');
+          return;
+        }
+
+        const deliveryAddress = metadata?.street
+          ? `${metadata.street}, ${metadata.city}, ${metadata.state} ${metadata.zipCode}`
+          : null;
+
+        const subtotal = amount_subtotal ? Number(amount_subtotal) / 100 : 0;
+        const tax = subtotal * 0.08;
+        const deliveryFee = 4.99;
+        const total = amount_total ? Number(amount_total) / 100 : 0;
+
+        const orderData: any = {
+          user_id: userId,
+          customer_name: customer_details?.name || 'Customer',
+          customer_email: customer_details?.email || '',
+          customer_phone: customer_details?.phone || '',
+          delivery_address: deliveryAddress,
+          delivery_street: metadata?.street || null,
+          delivery_city: metadata?.city || null,
+          delivery_state: metadata?.state || null,
+          delivery_zip_code: metadata?.zipCode || null,
+          address_id: metadata?.addressId || null,
+          subtotal,
+          tax,
+          delivery_fee: deliveryFee,
+          total,
+          status: 'confirmed',
+          payment_status: 'paid',
+          stripe_payment_intent_id: payment_intent,
+        };
+
+        const { error: mainOrderError } = await supabase.from('orders').insert(orderData);
+
+        if (mainOrderError) {
+          console.error('Error inserting order:', mainOrderError);
+          return;
+        }
+
+        console.info(`Successfully processed one-time payment and created order for session: ${checkout_session_id}`);
       } catch (error) {
         console.error('Error processing one-time payment:', error);
       }

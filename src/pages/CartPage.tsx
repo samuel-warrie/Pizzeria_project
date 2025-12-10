@@ -5,16 +5,40 @@ import { Plus, Minus, Trash2, ShoppingCart, ArrowLeft } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useStripeCheckout } from '../hooks/useStripeCheckout';
 import { getProductByName } from '../stripe-config';
+import AddressSelector from '../components/checkout/AddressSelector';
+
+interface SelectedAddress {
+  addressId?: string;
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  saveToProfile?: boolean;
+}
 
 const CartPage: React.FC = () => {
   const { cartItems, updateQuantity, removeFromCart, cartTotal } = useCart();
   const { createCheckoutSession, loading: checkoutLoading, error: checkoutError } = useStripeCheckout();
-  
+  const [selectedAddress, setSelectedAddress] = useState<SelectedAddress | null>(null);
+  const [addressError, setAddressError] = useState<string>('');
+
   useEffect(() => {
     document.title = 'Your Cart - Pizzeria Fornello';
   }, []);
-  
+
   const handleCheckout = async () => {
+    if (!selectedAddress) {
+      setAddressError('Please select or enter a delivery address');
+      return;
+    }
+
+    if (!selectedAddress.street || !selectedAddress.city || !selectedAddress.state || !selectedAddress.zipCode) {
+      setAddressError('Please complete all address fields');
+      return;
+    }
+
+    setAddressError('');
+
     const lineItems = cartItems.map(item => {
       const product = getProductByName(item.name);
       if (!product) {
@@ -31,6 +55,7 @@ const CartPage: React.FC = () => {
       mode: 'payment',
       successUrl: `${window.location.origin}/checkout/success`,
       cancelUrl: `${window.location.origin}/cart`,
+      address: selectedAddress,
     });
   };
 
@@ -55,7 +80,13 @@ const CartPage: React.FC = () => {
             {checkoutError}
           </div>
         )}
-        
+
+        {addressError && (
+          <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-6">
+            {addressError}
+          </div>
+        )}
+
         {cartItems.length === 0 ? (
           <div className="text-center py-16 bg-neutral-50 rounded-xl">
             <ShoppingCart className="h-16 w-16 text-neutral-400 mx-auto mb-4" />
@@ -133,11 +164,20 @@ const CartPage: React.FC = () => {
             
             {/* Order Summary */}
             <div className="lg:col-span-1">
+              <div className="bg-white rounded-xl shadow-md overflow-hidden mb-6">
+                <div className="p-6">
+                  <AddressSelector
+                    onAddressSelect={setSelectedAddress}
+                    selectedAddress={selectedAddress}
+                  />
+                </div>
+              </div>
+
               <div className="bg-white rounded-xl shadow-md overflow-hidden">
                 <div className="p-6 border-b border-neutral-200">
                   <h2 className="text-xl font-semibold">Order Summary</h2>
                 </div>
-                
+
                 <div className="p-6">
                   <div className="space-y-4 mb-6">
                     <div className="flex justify-between">
