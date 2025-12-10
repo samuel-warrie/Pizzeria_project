@@ -50,12 +50,21 @@ const CartPage: React.FC = () => {
       };
     });
 
+    const cartItemsData = cartItems.map(item => ({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+      menu_item_id: item.id,
+    }));
+
     await createCheckoutSession({
       lineItems,
       mode: 'payment',
       successUrl: `${window.location.origin}/checkout/success`,
       cancelUrl: `${window.location.origin}/cart`,
       address: selectedAddress,
+      cartItems: cartItemsData,
     });
   };
 

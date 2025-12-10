@@ -16,12 +16,22 @@ interface Address {
   saveToProfile?: boolean;
 }
 
+interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  menu_item_id?: string;
+  special_instructions?: string;
+}
+
 interface CheckoutOptions {
   lineItems: LineItem[];
   mode: 'payment' | 'subscription';
   successUrl: string;
   cancelUrl: string;
   address?: Address;
+  cartItems?: CartItem[];
 }
 
 export const useStripeCheckout = () => {
@@ -29,7 +39,7 @@ export const useStripeCheckout = () => {
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
 
-  const createCheckoutSession = async ({ lineItems, mode, successUrl, cancelUrl, address }: CheckoutOptions) => {
+  const createCheckoutSession = async ({ lineItems, mode, successUrl, cancelUrl, address, cartItems }: CheckoutOptions) => {
     if (!user) {
       setError('You must be logged in to checkout');
       return;
@@ -57,6 +67,7 @@ export const useStripeCheckout = () => {
           cancel_url: cancelUrl,
           mode,
           address,
+          cart_items: cartItems,
         }),
       });
 

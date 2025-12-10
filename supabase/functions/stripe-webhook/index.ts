@@ -15,7 +15,6 @@ const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPAB
 
 Deno.serve(async (req) => {
   try {
-    // Handle OPTIONS request for CORS preflight
     if (req.method === 'OPTIONS') {
       return new Response(null, { status: 204 });
     }
@@ -24,17 +23,14 @@ Deno.serve(async (req) => {
       return new Response('Method not allowed', { status: 405 });
     }
 
-    // get the signature from the header
     const signature = req.headers.get('stripe-signature');
 
     if (!signature) {
       return new Response('No signature found', { status: 400 });
     }
 
-    // get the raw body
     const body = await req.text();
 
-    // verify the webhook signature
     let event: Stripe.Event;
 
     try {
@@ -64,7 +60,6 @@ async function handleEvent(event: Stripe.Event) {
     return;
   }
 
-  // for one time payments, we only listen for the checkout.session.completed event
   if (event.type === 'payment_intent.succeeded' && event.data.object.invoice === null) {
     return;
   }
@@ -152,12 +147,44 @@ async function handleEvent(event: Stripe.Event) {
           stripe_payment_intent_id: payment_intent,
         };
 
-        const { error: mainOrderError } = await supabase.from('orders').insert(orderData);
+        const { data: createdOrder, error: mainOrderError } = await supabase.from('orders').insert(orderData).select().single();
 
-        if (mainOrderError) {
+        if (mainOrderError || !createdOrder) {
           console.error('Error inserting order:', mainOrderError);
           return;
         }
+
+        const cartItems = metadata?.cart_items;
+        if (cartItems) {
+          try {
+            const items = JSON.parse(cartItems);
+            if (Array.isArray(items) && items.length > 0) {
+              const orderItems = items.map((item: any) => ({
+                order_id: createdOrder.id,
+                menu_item_id: item.menu_item_id || item.id,
+                item_name: item.name,
+                item_price: item.price,
+                quantity: item.quantity,
+                special_instructions: item.special_instructions || null,
+              }));
+
+              const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
+
+              if (itemsError) {
+                console.error('Error inserting order items:', itemsError);
+              } else {
+                console.info(`Successfully inserted ${orderItems.length} order items`);
+              }
+            }
+          } catch (parseError) {
+            console.error('Error parsing cart items:', parseError);
+          }
+        }
+
+        await supabase
+          .from('stripe_orders')
+          .update({ order_id: createdOrder.id })
+          .eq('payment_intent_id', payment_intent);
 
         console.info(`Successfully processed one-time payment and created order for session: ${checkout_session_id}`);
       } catch (error) {
@@ -167,10 +194,8 @@ async function handleEvent(event: Stripe.Event) {
   }
 }
 
-// based on the excellent https://github.com/t3dotgg/stripe-recommendations
 async function syncCustomerFromStripe(customerId: string) {
   try {
-    // fetch latest subscription data from Stripe
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
       limit: 1,
@@ -178,7 +203,6 @@ async function syncCustomerFromStripe(customerId: string) {
       expand: ['data.default_payment_method'],
     });
 
-    // TODO verify if needed
     if (subscriptions.data.length === 0) {
       console.info(`No active subscriptions found for customer: ${customerId}`);
       const { error: noSubError } = await supabase.from('stripe_subscriptions').upsert(
@@ -197,10 +221,8 @@ async function syncCustomerFromStripe(customerId: string) {
       }
     }
 
-    // assumes that a customer can only have a single subscription
     const subscription = subscriptions.data[0];
 
-    // store subscription state
     const { error: subError } = await supabase.from('stripe_subscriptions').upsert(
       {
         customer_id: customerId,

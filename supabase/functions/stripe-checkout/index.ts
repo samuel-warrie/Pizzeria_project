@@ -11,7 +11,6 @@ const stripe = new Stripe(stripeSecret, {
   },
 });
 
-// Helper function to create responses with CORS headers
 function corsResponse(body: string | object | null, status = 200) {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -19,7 +18,6 @@ function corsResponse(body: string | object | null, status = 200) {
     'Access-Control-Allow-Headers': '*',
   };
 
-  // For 204 No Content, don't include Content-Type or body
   if (status === 204) {
     return new Response(null, { status, headers });
   }
@@ -43,7 +41,7 @@ Deno.serve(async (req) => {
       return corsResponse({ error: 'Method not allowed' }, 405);
     }
 
-    const { line_items, success_url, cancel_url, mode, address } = await req.json();
+    const { line_items, success_url, cancel_url, mode, address, cart_items } = await req.json();
 
     const error = validateParameters(
       { line_items, success_url, cancel_url, mode },
@@ -151,7 +149,10 @@ Deno.serve(async (req) => {
       sessionMetadata.zipCode = address.zipCode;
     }
 
-    // create Checkout Session with multiple line items
+    if (cart_items && Array.isArray(cart_items)) {
+      sessionMetadata.cart_items = JSON.stringify(cart_items);
+    }
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       line_items,
