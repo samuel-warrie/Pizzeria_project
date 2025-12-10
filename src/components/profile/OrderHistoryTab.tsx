@@ -108,8 +108,10 @@ export default function OrderHistoryTab() {
                     order.order_status
                   )}`}
                 >
-                  {order.order_status.charAt(0).toUpperCase() +
-                    order.order_status.slice(1)}
+                  {order.order_status
+                    ? order.order_status.charAt(0).toUpperCase() +
+                      order.order_status.slice(1)
+                    : 'Pending'}
                 </span>
               </div>
 

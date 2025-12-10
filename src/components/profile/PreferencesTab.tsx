@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
 
@@ -12,7 +13,8 @@ interface Preferences {
 }
 
 export default function PreferencesTab() {
-  const { user, updatePassword } = useAuth();
+  const navigate = useNavigate();
+  const { user, updatePassword, signOut } = useAuth();
   const [preferences, setPreferences] = useState<Preferences>({
     email_notifications: true,
     sms_notifications: false,
@@ -83,6 +85,22 @@ export default function PreferencesTab() {
     }
   };
 
+  const validatePassword = (password: string): string | null => {
+    if (password.length < 8) {
+      return 'Password must be at least 8 characters long';
+    }
+    if (!/[A-Z]/.test(password)) {
+      return 'Password must contain at least one uppercase letter';
+    }
+    if (!/[a-z]/.test(password)) {
+      return 'Password must contain at least one lowercase letter';
+    }
+    if (!/[0-9]/.test(password)) {
+      return 'Password must contain at least one number';
+    }
+    return null;
+  };
+
   const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setPasswordMessage('');
@@ -92,8 +110,9 @@ export default function PreferencesTab() {
       return;
     }
 
-    if (passwordData.newPassword.length < 6) {
-      setPasswordMessage('Password must be at least 6 characters');
+    const validationError = validatePassword(passwordData.newPassword);
+    if (validationError) {
+      setPasswordMessage(validationError);
       return;
     }
 
@@ -104,8 +123,13 @@ export default function PreferencesTab() {
 
       if (error) throw error;
 
-      setPasswordMessage('Password updated successfully!');
+      setPasswordMessage('Password updated successfully! Redirecting to login...');
       setPasswordData({ newPassword: '', confirmPassword: '' });
+
+      setTimeout(async () => {
+        await signOut();
+        navigate('/login');
+      }, 2000);
     } catch (error) {
       console.error('Error updating password:', error);
       setPasswordMessage('Failed to update password');
@@ -245,9 +269,12 @@ export default function PreferencesTab() {
                 }
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 placeholder="Enter new password"
-                minLength={6}
+                minLength={8}
                 required
               />
+              <p className="mt-1 text-sm text-gray-500">
+                Must be at least 8 characters with uppercase, lowercase, and numbers
+              </p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -261,7 +288,7 @@ export default function PreferencesTab() {
                 }
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 placeholder="Confirm new password"
-                minLength={6}
+                minLength={8}
                 required
               />
             </div>
