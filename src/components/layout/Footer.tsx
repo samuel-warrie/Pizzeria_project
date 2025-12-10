@@ -5,13 +5,17 @@ import { PizzaIcon, Phone, MapPin, Clock, Facebook, Instagram, Twitter } from 'l
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <footer className="bg-neutral-900 text-white pt-16 pb-8">
       <div className="container-custom">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {/* Logo and Description */}
           <div className="space-y-4">
-            <Link to="/" className="flex items-center space-x-2">
+            <Link to="/" onClick={scrollToTop} className="flex items-center space-x-2">
               <PizzaIcon className="h-8 w-8 text-primary-500" />
               <span className="font-serif text-2xl font-bold">
                 <span className="text-primary-500">Pizzeria</span>{' '}
@@ -52,19 +56,19 @@ const Footer: React.FC = () => {
             <h4 className="text-lg font-semibold mb-4 border-b border-neutral-700 pb-2">Navigation</h4>
             <ul className="space-y-2">
               <li>
-                <Link to="/" className="text-neutral-300 hover:text-primary-500 transition-colors">Home</Link>
+                <Link to="/" onClick={scrollToTop} className="text-neutral-300 hover:text-primary-500 transition-colors">Home</Link>
               </li>
               <li>
-                <Link to="/menu" className="text-neutral-300 hover:text-primary-500 transition-colors">Menu</Link>
+                <Link to="/menu" onClick={scrollToTop} className="text-neutral-300 hover:text-primary-500 transition-colors">Menu</Link>
               </li>
               <li>
-                <Link to="/about" className="text-neutral-300 hover:text-primary-500 transition-colors">About Us</Link>
+                <Link to="/about" onClick={scrollToTop} className="text-neutral-300 hover:text-primary-500 transition-colors">About Us</Link>
               </li>
               <li>
-                <Link to="/contact" className="text-neutral-300 hover:text-primary-500 transition-colors">Contact</Link>
+                <Link to="/contact" onClick={scrollToTop} className="text-neutral-300 hover:text-primary-500 transition-colors">Contact</Link>
               </li>
               <li>
-                <Link to="/cart" className="text-neutral-300 hover:text-primary-500 transition-colors">Order Online</Link>
+                <Link to="/cart" onClick={scrollToTop} className="text-neutral-300 hover:text-primary-500 transition-colors">Order Online</Link>
               </li>
             </ul>
           </div>
