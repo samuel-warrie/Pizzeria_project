@@ -8,9 +8,9 @@ interface Order {
   checkout_session_id: string;
   payment_intent_id: string;
   amount_total: number;
-  currency: string;
-  payment_status: string;
-  order_status: string;
+  currency: string | null;
+  payment_status: string | null;
+  order_status: string | null;
   order_date: string;
 }
 
@@ -51,14 +51,14 @@ export default function OrderHistoryTab() {
     });
   };
 
-  const formatAmount = (amount: number, currency: string) => {
+  const formatAmount = (amount: number, currency: string | null) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: currency.toUpperCase(),
+      currency: currency ? currency.toUpperCase() : 'USD',
     }).format(amount / 100);
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string | null) => {
     switch (status) {
       case 'completed':
         return 'bg-green-100 text-green-800';
@@ -118,7 +118,9 @@ export default function OrderHistoryTab() {
               <div className="flex justify-between items-end">
                 <div>
                   <p className="text-sm text-gray-600">Payment Status</p>
-                  <p className="font-medium capitalize">{order.payment_status}</p>
+                  <p className="font-medium capitalize">
+                    {order.payment_status || 'Pending'}
+                  </p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm text-gray-600">Total</p>
