@@ -117,11 +117,20 @@ Deno.serve(async (req) => {
     // create Checkout Session with multiple line items
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      payment_method_types: ['card'],
       line_items,
       mode,
       success_url,
       cancel_url,
+      payment_method_options: {
+        card: {
+          request_three_d_secure: 'automatic',
+        },
+      },
+      // Enable automatic payment methods including Google Pay and Apple Pay
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: 'always',
+      },
     });
 
     console.log(`Created checkout session ${session.id} for customer ${customerId}`);
