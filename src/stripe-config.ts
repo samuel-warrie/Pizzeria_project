@@ -5,7 +5,6 @@ export interface StripeProduct {
   description: string;
   price: number;
   currency: string;
-  currencySymbol: string;
   mode: 'payment' | 'subscription';
 }
 
@@ -17,7 +16,6 @@ export const stripeProducts: StripeProduct[] = [
     description: 'Artichokes, mushrooms, olives, and ham with tomato sauce and mozzarella',
     price: 14.99,
     currency: 'eur',
-    currencySymbol: '€',
     mode: 'payment'
   },
   {
@@ -27,7 +25,6 @@ export const stripeProducts: StripeProduct[] = [
     description: 'Ham and mushroom pizza with tomato sauce and mozzarella',
     price: 14.99,
     currency: 'eur',
-    currencySymbol: '€',
     mode: 'payment'
   },
   {
@@ -37,7 +34,6 @@ export const stripeProducts: StripeProduct[] = [
     description: 'Spicy pizza with tomato sauce, mozzarella, spicy salami, and chili peppers',
     price: 13.99,
     currency: 'eur',
-    currencySymbol: '€',
     mode: 'payment'
   },
   {
@@ -47,7 +43,6 @@ export const stripeProducts: StripeProduct[] = [
     description: 'Four cheese pizza with mozzarella, gorgonzola, fontina, and parmigiano reggiano',
     price: 13.99,
     currency: 'eur',
-    currencySymbol: '€',
     mode: 'payment'
   },
   {
@@ -57,7 +52,6 @@ export const stripeProducts: StripeProduct[] = [
     description: 'American favorite topped with tomato sauce, mozzarella, and crispy pepperoni',
     price: 12.99,
     currency: 'eur',
-    currencySymbol: '€',
     mode: 'payment'
   },
   {
@@ -67,7 +61,6 @@ export const stripeProducts: StripeProduct[] = [
     description: 'Classic pizza with tomato sauce, mozzarella, fresh basil, salt, and extra-virgin olive oil',
     price: 10.99,
     currency: 'eur',
-    currencySymbol: '€',
     mode: 'payment'
   }
 ];
@@ -78,8 +71,4 @@ export const getProductByPriceId = (priceId: string): StripeProduct | undefined 
 
 export const getProductById = (id: string): StripeProduct | undefined => {
   return stripeProducts.find(product => product.id === id);
-};
-
-export const getProductByName = (name: string): StripeProduct | undefined => {
-  return stripeProducts.find(product => product.name === name);
 };

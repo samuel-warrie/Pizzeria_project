@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { PizzaCard } from '../components/PizzaCard';
+import { ProductCard } from '../components/ProductCard';
 import { stripeProducts } from '../stripe-config';
 
 export const Menu: React.FC = () => {
@@ -8,12 +8,15 @@ export const Menu: React.FC = () => {
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Our Pizza Menu</h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Our Delicious Pizzas
+          </h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Authentic Italian pizzas made with the finest ingredients and traditional recipes
           </p>
         </motion.div>
@@ -24,9 +27,9 @@ export const Menu: React.FC = () => {
               key={product.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
             >
-              <PizzaCard product={product} />
+              <ProductCard product={product} />
             </motion.div>
           ))}
         </div>
