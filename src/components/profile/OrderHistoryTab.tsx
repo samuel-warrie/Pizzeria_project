@@ -1,7 +1,16 @@
 import { useState, useEffect } from 'react';
-import { Package, Loader2, MapPin } from 'lucide-react';
+import { Package, Loader2, MapPin, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
+
+interface OrderItem {
+  id: string;
+  menu_item_id: string;
+  item_name: string;
+  item_price: number;
+  quantity: number;
+  special_instructions: string | null;
+}
 
 interface Order {
   id: string;
@@ -14,12 +23,14 @@ interface Order {
   delivery_state: string | null;
   delivery_zip_code: string | null;
   delivery_address: string | null;
+  order_items: OrderItem[];
 }
 
 export default function OrderHistoryTab() {
   const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (user) {
@@ -31,7 +42,26 @@ export default function OrderHistoryTab() {
     try {
       const { data, error } = await supabase
         .from('orders')
-        .select('id, total, status, payment_status, created_at, delivery_street, delivery_city, delivery_state, delivery_zip_code, delivery_address')
+        .select(`
+          id,
+          total,
+          status,
+          payment_status,
+          created_at,
+          delivery_street,
+          delivery_city,
+          delivery_state,
+          delivery_zip_code,
+          delivery_address,
+          order_items (
+            id,
+            menu_item_id,
+            item_name,
+            item_price,
+            quantity,
+            special_instructions
+          )
+        `)
         .eq('user_id', user?.id)
         .order('created_at', { ascending: false });
 
@@ -84,6 +114,18 @@ export default function OrderHistoryTab() {
       return `${order.delivery_street}, ${order.delivery_city}, ${order.delivery_state} ${order.delivery_zip_code}`;
     }
     return order.delivery_address || 'No address provided';
+  };
+
+  const toggleOrderExpansion = (orderId: string) => {
+    setExpandedOrders(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(orderId)) {
+        newSet.delete(orderId);
+      } else {
+        newSet.add(orderId);
+      }
+      return newSet;
+    });
   };
 
   if (loading) {
@@ -142,7 +184,57 @@ export default function OrderHistoryTab() {
                 </div>
               )}
 
-              <div className="flex justify-between items-end">
+              {order.order_items && order.order_items.length > 0 && (
+                <div className="mt-4 border-t border-gray-200 pt-4">
+                  <button
+                    onClick={() => toggleOrderExpansion(order.id)}
+                    className="flex items-center gap-2 text-sm font-medium text-orange-600 hover:text-orange-700 transition-colors"
+                  >
+                    {expandedOrders.has(order.id) ? (
+                      <>
+                        <ChevronUp className="w-4 h-4" />
+                        Hide Items ({order.order_items.length})
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="w-4 h-4" />
+                        View Items ({order.order_items.length})
+                      </>
+                    )}
+                  </button>
+
+                  {expandedOrders.has(order.id) && (
+                    <div className="mt-4 space-y-3">
+                      {order.order_items.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex justify-between items-start p-3 bg-gray-50 rounded-lg"
+                        >
+                          <div className="flex-1">
+                            <p className="font-medium text-gray-900">{item.item_name}</p>
+                            <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
+                            {item.special_instructions && (
+                              <p className="text-sm text-gray-500 italic mt-1">
+                                Note: {item.special_instructions}
+                              </p>
+                            )}
+                          </div>
+                          <div className="text-right">
+                            <p className="font-medium text-gray-900">
+                              {formatAmount(item.item_price * item.quantity)}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              {formatAmount(item.item_price)} each
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="flex justify-between items-end mt-4">
                 <div>
                   <p className="text-sm text-gray-600">Payment Status</p>
                   <p className="font-medium capitalize">
