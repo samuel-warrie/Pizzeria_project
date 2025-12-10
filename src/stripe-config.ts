@@ -72,3 +72,7 @@ export const getProductByPriceId = (priceId: string): StripeProduct | undefined 
 export const getProductById = (id: string): StripeProduct | undefined => {
   return stripeProducts.find(product => product.id === id);
 };
+
+export const getProductByName = (name: string): StripeProduct | undefined => {
+  return stripeProducts.find(product => product.name === name);
+};
