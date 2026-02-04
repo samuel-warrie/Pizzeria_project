@@ -2,7 +2,7 @@ import React from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import Cart from '../cart/Cart';
-import WelcomePopup from '../WelcomePopup';
+import ChatbotMessages from '../ChatbotMessages';
 import { CartProvider } from '../../context/CartContext';
 
 interface LayoutProps {
@@ -17,7 +17,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <main className="flex-grow">{children}</main>
         <Cart />
         <Footer />
-        <WelcomePopup />
+        <ChatbotMessages />
       </div>
     </CartProvider>
   );
