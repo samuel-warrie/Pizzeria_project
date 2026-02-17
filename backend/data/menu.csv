@@ -1,0 +1,7 @@
+id,name,ingredients,category,diet,price,allergens
+1,Margherita,tomato sauce mozzarella basil olive oil,veg,veg,10.99,dairy gluten
+2,Pepperoni,tomato sauce mozzarella pepperoni,meat,non-veg,12.99,dairy gluten
+3,Quattro Formaggi,mozzarella gorgonzola fontina parmigiano,veg,veg,13.99,dairy gluten
+4,Diavola,tomato sauce mozzarella spicy salami chili peppers,spicy,non-veg,13.99,dairy gluten
+5,Prosciutto e Funghi,tomato sauce mozzarella ham mushroom,meat,non-veg,14.99,dairy gluten
+6,Capricciosa,tomato sauce mozzarella artichokes mushrooms olives ham,meat,non-veg,14.99,dairy gluten
