@@ -10,10 +10,12 @@ menu["features"] = (
     menu["diet"]
 )
 
+#Popularity-based recommender
 def get_popular_pizzas(top_n=3):
     popular = orders['pizza_name'].value_counts().head(top_n)
     return popular.index.tolist()
 
+#Dietary recommender
 def get_diet_recommendations(diet_type, top_n=3):
     filtered = menu[menu["diet"] == diet_type]
 
@@ -24,6 +26,7 @@ def get_diet_recommendations(diet_type, top_n=3):
     #return random selection of pizzas from the filtered list
     return filtered["name"].sample(min(top_n, len(filtered))).tolist()
 
+#Content-based recommender
 vectorizer = TfidfVectorizer()
 feature_matrix = vectorizer.fit_transform(menu["features"])
 similarity_matrix = cosine_similarity(feature_matrix)
@@ -45,7 +48,6 @@ def recommend_similar_pizzas(pizza_name, top_n=3):
 
     #skip first one since it's the same pizza
     similar_indices = [i[0] for i in scores[1:top_n+1]]
-
     return menu.iloc[similar_indices]["name"].tolist()
 
 def recommend_for_user(user_id):
