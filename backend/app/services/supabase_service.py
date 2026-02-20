@@ -25,6 +25,7 @@ def get_all_ordered_pizzas():
     return [item["item_name"] for item in response.data]
 
 def get_user_orders_from_db(user_id: str):
+   
     response = (
         supabase.table("orders")
         .select("""

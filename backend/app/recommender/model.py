@@ -45,25 +45,21 @@ def get_diet_recommendations(diet_type, top_n=3):
 def recommend_similar_pizzas(pizza_name, top_n=3):
     #find index of pizza
     idx = menu[menu["name"] == pizza_name].index
-
     if len(idx) == 0:
         return {"error": "Pizza not found"}
 
     idx = idx[0]
-
     #get similarity scores
     scores = list(enumerate(similarity_matrix[idx]))
 
     #sort by similarity
     scores = sorted(scores, key=lambda x: x[1], reverse=True)
-
     #skip first one since it's the same pizza
-    similar_indices = [i[0] for i in scores[1:top_n+1]]
+    similar_indices = [i[0] for i in scores[1:top_n+1]] 
     return menu.iloc[similar_indices]["name"].tolist()
 
 def recommend_for_user(user_id: str, top_n=3):
     user_orders = get_user_orders_from_db(user_id)
-
     if not user_orders:
         return ["Margherita"] 
 

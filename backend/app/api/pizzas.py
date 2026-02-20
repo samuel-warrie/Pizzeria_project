@@ -25,7 +25,6 @@ async def list_pizzas():
 
 @router.get("/orders")
 async def get_pizza_recommendations():
-    print("order endpoint hit")
     response = supabase.table("pizza_recommendations").select("*").execute()
     return response.data
 
@@ -33,7 +32,6 @@ async def get_pizza_recommendations():
 
 @router.get("/user/{user_id}")
 async def get_user_orders(user_id: str):
-    
     response = (
         supabase.table("orders")
         .select("""
