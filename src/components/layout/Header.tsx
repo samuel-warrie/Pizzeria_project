@@ -97,6 +97,20 @@ const Header: React.FC = () => {
               {link.name}
             </Link>
           ))}
+          {user && (
+            <Link
+              to="/recommend"
+              className={`font-medium transition-colors duration-300 ${
+                isActive("/recommend")
+                  ? "text-primary-600"
+                  : isScrolled
+                    ? "text-neutral-800 hover:text-primary-600"
+                    : "text-white hover:text-primary-100"
+              }`}
+            >
+              Recommend
+            </Link>
+          )}
         </nav>
 
         <div className="flex items-center space-x-3">

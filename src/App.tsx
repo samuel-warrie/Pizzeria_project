@@ -1,20 +1,20 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import Layout from './components/layout/Layout';
-import HomePage from './pages/HomePage';
-import MenuPage from './pages/MenuPage';
-import { Menu } from './pages/Menu';
-import AboutPage from './pages/AboutPage';
-import ContactPage from './pages/ContactPage';
-import CartPage from './pages/CartPage';
-import LoginPage from './pages/LoginPage';
-import SignupPage from './pages/SignupPage';
-import { Auth } from './pages/Auth';
-import CheckoutSuccessPage from './pages/CheckoutSuccessPage';
-import { Success } from './pages/Success';
-import ProfilePage from './pages/ProfilePage';
-import PrivateRoute from './components/PrivateRoute';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import Layout from "./components/layout/Layout";
+import HomePage from "./pages/HomePage";
+import MenuPage from "./pages/MenuPage";
+import { Menu } from "./pages/Menu";
+import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
+import CartPage from "./pages/CartPage";
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
+import { Auth } from "./pages/Auth";
+import CheckoutSuccessPage from "./pages/CheckoutSuccessPage";
+import { Success } from "./pages/Success";
+import ProfilePage from "./pages/ProfilePage";
+import PrivateRoute from "./components/PrivateRoute";
+import RecommendPage from "./pages/RecommendPage";
 
 function App() {
   return (
@@ -55,6 +55,14 @@ function App() {
               }
             />
             <Route path="/success" element={<Success />} />
+            <Route
+              path="/recommend"
+              element={
+                <PrivateRoute>
+                  <RecommendPage />
+                </PrivateRoute>
+              }
+            />
           </Routes>
         </Layout>
       </Router>
