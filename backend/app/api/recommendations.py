@@ -10,7 +10,7 @@ def get_popular():
     return get_popular_pizzas()
 
 @router.get("/user/{user_id}")
-def get_user_recommendations(user_id: int):
+def get_user_recommendations(user_id: str):
     return recommend_for_user(user_id)
 
 @router.get("/diet/{diet_type}")

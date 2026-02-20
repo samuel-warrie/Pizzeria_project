@@ -1,8 +1,11 @@
-from .data import load_data
+import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from app.services.supabase_service import get_user_orders_from_db
+from collections import Counter
+from app.services.supabase_service import get_all_ordered_pizzas
 
-orders, menu = load_data()
+menu = pd.read_csv("data/menu.csv")
 
 menu["features"] = (
     menu["ingredients"] + " " +
@@ -10,10 +13,21 @@ menu["features"] = (
     menu["diet"]
 )
 
+vectorizer = TfidfVectorizer()
+feature_matrix = vectorizer.fit_transform(menu["features"])
+similarity_matrix = cosine_similarity(feature_matrix)
+
 #Popularity-based recommender
 def get_popular_pizzas(top_n=3):
-    popular = orders['pizza_name'].value_counts().head(top_n)
-    return popular.index.tolist()
+    pizzas = get_all_ordered_pizzas()
+
+    if not pizzas:
+        return ["Margherita"] 
+
+    counter = Counter(pizzas)
+    most_common = counter.most_common(top_n)
+
+    return [pizza[0] for pizza in most_common]
 
 #Dietary recommender
 def get_diet_recommendations(diet_type, top_n=3):
@@ -27,9 +41,6 @@ def get_diet_recommendations(diet_type, top_n=3):
     return filtered["name"].sample(min(top_n, len(filtered))).tolist()
 
 #Content-based recommender
-vectorizer = TfidfVectorizer()
-feature_matrix = vectorizer.fit_transform(menu["features"])
-similarity_matrix = cosine_similarity(feature_matrix)
 
 def recommend_similar_pizzas(pizza_name, top_n=3):
     #find index of pizza
@@ -50,14 +61,13 @@ def recommend_similar_pizzas(pizza_name, top_n=3):
     similar_indices = [i[0] for i in scores[1:top_n+1]]
     return menu.iloc[similar_indices]["name"].tolist()
 
-def recommend_for_user(user_id):
+def recommend_for_user(user_id: str, top_n=3):
+    user_orders = get_user_orders_from_db(user_id)
 
-    user_orders = orders[orders["user_id"] == user_id]
+    if not user_orders:
+        return ["Margherita"] 
 
-    if user_orders.empty:
-        return {"message": "No orders found"}
+    last_pizza = user_orders[-1]["pizza_name"]
 
-    last_pizza = user_orders.iloc[-1]["pizza_name"]
-
-    return recommend_similar_pizzas(last_pizza)
+    return recommend_similar_pizzas(last_pizza, top_n)
 
