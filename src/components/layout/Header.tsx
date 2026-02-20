@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { PizzaIcon, Menu, X, ShoppingCart, User, LogOut } from "lucide-react";
-import { useCart } from "../../context/CartContext";
-import { useAuth } from "../../context/AuthContext";
-import MobileMenu from "./MobileMenu";
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { PizzaIcon, Menu, X, ShoppingCart, User, LogOut } from 'lucide-react';
+import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
+import MobileMenu from './MobileMenu';
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -21,8 +21,8 @@ const Header: React.FC = () => {
       setIsScrolled(window.scrollY > 50);
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
@@ -37,27 +37,26 @@ const Header: React.FC = () => {
   const handleLogout = async () => {
     await signOut();
     setIsUserMenuOpen(false);
-    navigate("/");
+    navigate('/');
   };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      if (isUserMenuOpen && !target.closest(".user-menu-container")) {
+      if (isUserMenuOpen && !target.closest('.user-menu-container')) {
         setIsUserMenuOpen(false);
       }
     };
 
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, [isUserMenuOpen]);
 
   const navLinks = [
-    { name: "Home", path: "/" },
-    { name: "Menu", path: "/menu" },
-    { name: "About", path: "/about" },
-    { name: "Contact", path: "/contact" },
-    // Recommend link will be conditionally rendered below
+    { name: 'Home', path: '/' },
+    { name: 'Menu', path: '/menu' },
+    { name: 'About', path: '/about' },
+    { name: 'Contact', path: '/contact' },
   ];
 
   const isActive = (path: string) => {
@@ -67,15 +66,15 @@ const Header: React.FC = () => {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-white shadow-md py-3" : "bg-transparent py-5"
+        isScrolled ? 'bg-white shadow-md py-3' : 'bg-transparent py-5'
       }`}
     >
       <div className="container-custom flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-2">
           <PizzaIcon className="h-8 w-8 text-primary-600" />
           <span className="font-serif text-2xl font-bold">
-            <span className="text-primary-600">Pizzeria</span>{" "}
-            <span className={isScrolled ? "text-neutral-800" : "text-white"}>
+            <span className="text-primary-600">Pizzeria</span>{' '}
+            <span className={isScrolled ? 'text-neutral-800' : 'text-white'}>
               Fornello
             </span>
           </span>
@@ -89,10 +88,10 @@ const Header: React.FC = () => {
               to={link.path}
               className={`font-medium transition-colors duration-300 ${
                 isActive(link.path)
-                  ? "text-primary-600"
+                  ? 'text-primary-600'
                   : isScrolled
-                    ? "text-neutral-800 hover:text-primary-600"
-                    : "text-white hover:text-primary-100"
+                  ? 'text-neutral-800 hover:text-primary-600'
+                  : 'text-white hover:text-primary-100'
               }`}
             >
               {link.name}
@@ -119,8 +118,8 @@ const Header: React.FC = () => {
             onClick={toggleCart}
             className={`relative p-2 rounded-full transition-colors ${
               isScrolled
-                ? "text-neutral-800 hover:bg-neutral-100"
-                : "text-white hover:bg-white/10"
+                ? 'text-neutral-800 hover:bg-neutral-100'
+                : 'text-white hover:bg-white/10'
             }`}
             aria-label="Shopping cart"
           >
@@ -138,8 +137,8 @@ const Header: React.FC = () => {
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                 className={`flex items-center gap-2 p-2 rounded-full transition-colors ${
                   isScrolled
-                    ? "text-neutral-800 hover:bg-neutral-100"
-                    : "text-white hover:bg-white/10"
+                    ? 'text-neutral-800 hover:bg-neutral-100'
+                    : 'text-white hover:bg-white/10'
                 }`}
                 aria-label="User menu"
               >
@@ -172,8 +171,8 @@ const Header: React.FC = () => {
                 to="/login"
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   isScrolled
-                    ? "text-neutral-800 hover:bg-neutral-100"
-                    : "text-white hover:bg-white/10"
+                    ? 'text-neutral-800 hover:bg-neutral-100'
+                    : 'text-white hover:bg-white/10'
                 }`}
               >
                 Login
@@ -190,18 +189,18 @@ const Header: React.FC = () => {
           <button
             onClick={toggleMobileMenu}
             className="p-2 md:hidden rounded-full transition-colors"
-            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
           >
             {isMobileMenuOpen ? (
               <X
                 className={`h-6 w-6 ${
-                  isScrolled ? "text-neutral-800" : "text-white"
+                  isScrolled ? 'text-neutral-800' : 'text-white'
                 }`}
               />
             ) : (
               <Menu
                 className={`h-6 w-6 ${
-                  isScrolled ? "text-neutral-800" : "text-white"
+                  isScrolled ? 'text-neutral-800' : 'text-white'
                 }`}
               />
             )}
@@ -212,11 +211,7 @@ const Header: React.FC = () => {
       {/* Mobile Menu */}
       <MobileMenu
         isOpen={isMobileMenuOpen}
-        navLinks={
-          user
-            ? [...navLinks, { name: "Recommend", path: "/recommend" }]
-            : navLinks
-        }
+        navLinks={navLinks}
         user={user}
         onLogout={handleLogout}
       />
