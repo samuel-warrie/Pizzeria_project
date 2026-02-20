@@ -25,11 +25,28 @@ export default function RecommendPage() {
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          Your Past Orders
+          Recommended for You
         </h1>
         {!user && <div>Please log in to see your recommendations.</div>}
-        {loading && <div>Loading...</div>}
-        {error && <div className="text-red-500">{error}</div>}
+        {loading && ( <div className="text-center py-10 text-gray-500 animate-pulse">
+         Finding pizzas you'll love 🍕
+        </div>)}
+
+        {error && (
+  <div className="text-center py-10">
+    <p className="text-red-500 font-semibold mb-2">
+       Oops! We couldn’t load your recommendations.
+    </p>
+    
+
+    <button
+      onClick={() => window.location.reload()}
+      className="mt-4 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
+    >
+      Try Again
+    </button>
+    </div>)}
+
         {orders && Array.isArray(orders) && orders.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {orders.map((order: any) => (
