@@ -16,6 +16,28 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   const [error, setError] = React.useState<string | null>(null);
   const [isPopupOpen, setIsPopupOpen] = React.useState(false);
   const [popularItems, setPopularItems] = React.useState<string[]>([]);
+  const [dietaryItems, setDietaryItems] = React.useState<string[]>([]);
+
+  const handleDietary = async ({ diet }) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const apiUrl = `http://127.0.0.1:8000/recommend/diet/${diet}`;
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setDietaryItems(data);
+      setIsPopupOpen(true);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to fetch vegan options",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSeePopular = async () => {
     setIsLoading(true);
@@ -55,16 +77,32 @@ const CategorySection: React.FC<CategorySectionProps> = ({
             >
               {isLoading ? "Loading..." : "See Popular"}
             </button>
+
+            <button
+              className="ml-4 bg-green-500 hover:bg-amber-600 text-white px-3 py-1 rounded-full text-sm"
+              onClick={handleDietary.bind(null, { diet: "veg" })}
+            >
+              {isLoading ? "Loading..." : "Vegetarian"}
+            </button>
+            <button
+              className="ml-4 bg-primary-600 hover:bg-amber-600 text-white px-3 py-1 rounded-full text-sm"
+              onClick={handleDietary.bind(null, { diet: "non-veg" })}
+            >
+              {isLoading ? "Loading..." : "Non-Vegetarian"}
+            </button>
           </h2>
         </div>
         <p className="text-neutral-600 mb-6">{category.description}</p>
       </motion.div>
       <PopularPizzasPopup
         isOpen={isPopupOpen}
-        onClose={() => setIsPopupOpen(false)}
+        onClose={() => {
+          setPopularItems([]);
+          setIsPopupOpen(false);
+        }}
         isLoading={isLoading}
         error={error}
-        items={popularItems}
+        items={popularItems.length > 0 ? popularItems : dietaryItems}
       />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {items.map((item, index) => (

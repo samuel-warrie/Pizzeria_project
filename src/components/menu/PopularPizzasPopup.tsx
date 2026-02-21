@@ -24,7 +24,6 @@ const PopularPizzasPopup: React.FC<PopularPizzasPopupProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xl font-semibold">Popular Pizzas</h3>
           <button
             type="button"
             className="text-neutral-500 hover:text-neutral-800"
@@ -41,7 +40,7 @@ const PopularPizzasPopup: React.FC<PopularPizzasPopupProps> = ({
         )}
 
         {!isLoading && !error && items.length === 0 && (
-          <p className="text-sm text-neutral-600">No popular items found.</p>
+          <p className="text-sm text-neutral-600">No items found.</p>
         )}
 
         {!isLoading && !error && items.length > 0 && (
