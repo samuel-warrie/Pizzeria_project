@@ -8,6 +8,8 @@ interface CategorySectionProps {
   items: MenuItem[];
 }
 
+type ActiveTab = "popular" | "veg" | "non-veg";
+
 const CategorySection: React.FC<CategorySectionProps> = ({
   category,
   items,
@@ -17,10 +19,13 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   const [isPopupOpen, setIsPopupOpen] = React.useState(false);
   const [popularItems, setPopularItems] = React.useState<string[]>([]);
   const [dietaryItems, setDietaryItems] = React.useState<string[]>([]);
+  const [activeTab, setActiveTab] = React.useState<ActiveTab | null>(null);
 
   const handleDietary = async ({ diet }) => {
     setIsLoading(true);
     setError(null);
+    setActiveTab(diet);
+
     try {
       const apiUrl = `http://127.0.0.1:8000/recommend/diet/${diet}`;
       const response = await fetch(apiUrl);
@@ -39,9 +44,20 @@ const CategorySection: React.FC<CategorySectionProps> = ({
     }
   };
 
+  const activeTabLabel =
+    activeTab === "popular"
+      ? "Popular Pizzas"
+      : activeTab === "veg"
+        ? "Vegetarian Pizzas"
+        : activeTab === "non-veg"
+          ? "Non-Vegetarian Pizzas"
+          : "";
+
   const handleSeePopular = async () => {
     setIsLoading(true);
     setError(null);
+    setActiveTab("popular");
+
     try {
       const apiUrl = "http://127.0.0.1:8000/recommend/popular";
       const response = await fetch(apiUrl);
@@ -103,6 +119,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
         isLoading={isLoading}
         error={error}
         items={popularItems.length > 0 ? popularItems : dietaryItems}
+        activeTabLabel={activeTabLabel}
       />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {items.map((item, index) => (

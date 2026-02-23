@@ -6,6 +6,7 @@ interface PopularPizzasPopupProps {
   isLoading: boolean;
   error: string | null;
   items: string[];
+  activeTabLabel: string;
 }
 
 const PopularPizzasPopup: React.FC<PopularPizzasPopupProps> = ({
@@ -14,6 +15,7 @@ const PopularPizzasPopup: React.FC<PopularPizzasPopupProps> = ({
   isLoading,
   error,
   items,
+  activeTabLabel,
 }) => {
   if (!isOpen) return null;
 
@@ -24,6 +26,8 @@ const PopularPizzasPopup: React.FC<PopularPizzasPopupProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-3">
+          <h3 className="text-lg font-semibold">{activeTabLabel}</h3>
+
           <button
             type="button"
             className="text-neutral-500 hover:text-neutral-800"
