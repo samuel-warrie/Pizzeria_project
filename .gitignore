@@ -8,3 +8,4 @@ __pycache__/
 # Environments
 backend/venv/
 
+config.bat
