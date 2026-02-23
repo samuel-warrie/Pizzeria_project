@@ -31,7 +31,7 @@
                 window.voiceflow.chat.proactive.push({
                   type: 'text',
                   payload: {
-                    message: "👋 Hi, I'm Nello. Welcome to Pizzeria Fornello. Craving something fresh from the oven?"
+                    message: "Hey there! I'm Nello, your pizza guide at Fornello"
                   }
                 });
 
@@ -39,7 +39,7 @@
                   window.voiceflow.chat.proactive.push({
                     type: 'text',
                     payload: {
-                      message: "🍕 Not sure what to choose? Tell me what you're in the mood for and I'll recommend the perfect pizza for you"
+                      message: "Want a recommendation? Just tell me what flavors you love"
                     }
                   });
 
@@ -47,14 +47,14 @@
                     window.voiceflow.chat.proactive.push({
                       type: 'text',
                       payload: {
-                        message: "⭐ Our most popular pizzas are going fast. Let me help you find something you'll love in under 30 seconds"
+                        message: "Or feel free to ask me anything about our menu!"
                       }
                     });
-                  }, 5000);
+                  }, 4000);
 
-                }, 5000);
+                }, 3000);
 
-              }, 5000);
+              }, 3000);
             } catch (e) {
               console.error("Voiceflow chat failed to load:", e);
             }
