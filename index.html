@@ -17,14 +17,47 @@
       (function(d, t) {
           var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
           v.onload = function() {
-            window.voiceflow.chat.load({
-              verify: { projectID: '68f882de57acbd73f0db6e2a' },
-              url: 'https://general-runtime.voiceflow.com',
-              versionID: 'production',
-              voice: {
-                url: "https://runtime-api.voiceflow.com"
-              }
-            });
+            try {
+              window.voiceflow.chat.load({
+                verify: { projectID: '68f882de57acbd73f0db6e2a' },
+                url: 'https://general-runtime.voiceflow.com',
+                versionID: 'production',
+                voice: {
+                  url: "https://runtime-api.voiceflow.com"
+                }
+              });
+
+              setTimeout(() => {
+                window.voiceflow.chat.proactive.push({
+                  type: 'text',
+                  payload: {
+                    message: "👋 Hi, I'm Nello. Welcome to Pizzeria Fornello. Craving something fresh from the oven?"
+                  }
+                });
+
+                setTimeout(() => {
+                  window.voiceflow.chat.proactive.push({
+                    type: 'text',
+                    payload: {
+                      message: "🍕 Not sure what to choose? Tell me what you're in the mood for and I'll recommend the perfect pizza for you"
+                    }
+                  });
+
+                  setTimeout(() => {
+                    window.voiceflow.chat.proactive.push({
+                      type: 'text',
+                      payload: {
+                        message: "⭐ Our most popular pizzas are going fast. Let me help you find something you'll love in under 30 seconds"
+                      }
+                    });
+                  }, 5000);
+
+                }, 5000);
+
+              }, 5000);
+            } catch (e) {
+              console.error("Voiceflow chat failed to load:", e);
+            }
           }
           v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
       })(document, 'script');
